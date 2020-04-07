@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--<script type="text/javascript" src="http://latex.codecogs.com/latexit.js"></script> -->
+  <!--Include the following two lines to write latex syntax in html -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=1024, user-scalable=no">
+
+  <title>Group Meeting Presentation</title>
+
+  <!-- Required stylesheet -->
+  <link rel="stylesheet" media="screen" href="core/deck.core.css">
+
+  <!-- Extension CSS files go here. Remove or add as needed. -->
+  <link rel="stylesheet" media="screen" href="extensions/goto/deck.goto.css">
+  <link rel="stylesheet" media="screen" href="extensions/menu/deck.menu.css">
+  <link rel="stylesheet" media="screen" href="extensions/navigation/deck.navigation.css">
+  <link rel="stylesheet" media="screen" href="extensions/status/deck.status.css">
+  <link rel="stylesheet" media="screen" href="extensions/scale/deck.scale.css">
+
+  <!-- Style theme. More available in /themes/style/ or create your own. -->
+  <!-- <link rel="stylesheet" media="screen" href="themes/style/web-2.0.css"> -->
+  <link rel="stylesheet" media="screen" href="themes/style/web-2.0.css">
+
+  <!-- Transition theme. More available in /themes/transition/ or create your own. -->
+  <link rel="stylesheet" media="screen" href="themes/transition/horizontal-slide.css">
+
+  <!-- Basic black and white print styles -->
+  <link rel="stylesheet" media="print" href="core/print.css">
+
+  <!-- Required Modernizr file -->
+  <script src="modernizr.custom.js"></script>
+</head>
+<body>
+  <div class="deck-container">
+
+    <!-- Begin slides. Just make elements with a class of slide. -->
+    <!--  Slide 1 -->
+    <section class="slide">
+      <h2>Discrete Space Discrete Time Markov Chains for Distributed Mapping using Consensus</h2>
+      <h3> Aniket Shirsat</h3>
+      <h3> 04/08/2020</h3>
+    </section>
+    <!-- Slide 2 -->
+    <section class="slide">
+    <h2> Summary of the discussion</h2>
+      <ul style="list-style-type:square;">
+      	<li> Main Conrtibutions </li>
+        <li> Problem Statement </li>
+        <li> Markov Chains Analysis</li>
+        <li> Consensus Strategy </li>
+        <li> Simulation Results and Conclusion</li>
+        <!-- <li>Future Work</li> -->
+    </section>
+    
+    <!-- Slide 3 -->
+    <section class="slide">
+      <h2> Problem Statement </h2>
+      <ul style="list-style-type: square;">
+        <li>To generate a map \( \mathcal{M} \) of an environment by a group of agents who traverse the environment using a random walk approach and have only local communication capability</li>
+        <li> In this paper we take a first step in formulating the basic results for the above strategy.</li>
+      </ul>
+    </section>
+
+    <!-- Slide 4 -->
+    <section class="slide">
+      <h2> Notations & Assumptions  </h2>
+      <div class="column" style="float: left; width: 50%">
+        <ul style="list-style-type: square;">
+          <li> We consider an unknown, bounded environment that contains a finite, non-zero number of static features of interest, indexed by the set \( \mathcal{I} \subset \mathbb{Z}_+ \), where \( \mathbb{Z}_+ \) is the set of positive integers.</li>
+          <li> A set of \( N \) agents, indexed by the set \( \mathcal{N} = \{1,2,...,N\}\), explore the environment using a random walk strategy. </li>
+          <li> We assume that each agent can localize itself in the environment and can detect a feature within its sensing range.</li>
+          <li> The agent associates the detected feature with a \( \textit{scalar information state} \) \( \xi_{a}[k] \)</li> 
+          <li> The vector of information states for all agents at time \( k \) is denoted by \( \boldsymbol{\xi}[k] \)</li>
+          <li> The initial information state of each agent \( a \) is specified \( \textit{a priori} \) as \( \xi_{a}[0] \sim \mathcal{U}(0,1) \) </li>
+          <li> The agent can communicate its information state \( \xi_{a}[k] \) at time \( k \) to all agents within a disc of radius \( r_{comm} \in (0,\delta] \), where \( \delta \) is the maximum communication radius.</li> 
+          <li>We define these agents as the set of \( \textit{neighbors} \) of agent \( a \) at time \( k \), denoted by \( \mathcal{N}_k^a \).</li>
+          <li> We also assume that the agents can avoid each other and obastcales in the environment if any. </li>
+          <li> We discretize the environment into a square grid of nodes spaced distance \( d \) apart and denote them by \( \mathcal{S} \subset \mathbb{Z}_{+} \). </li>
+        </ul>
+      </div>
+      <div class="column" style="float: right; width: 50%">
+        <ul style="list-style-type: square;">
+          <li> \( \mathcal{G}_{s} = (\mathcal{V}_{s}, \mathcal{E}_{s}) \) be an undirected graph associated with this finite spatial grid</li>
+          <li> \( \mathcal{Z}_k^a \) denotes the random variable that represents the node position that an agent \( a \) occupies at time instance \( k \).
+          <li> The agents distribution is given by \( \pi_{k+1} = \pi_{k}\mathbf{P}, \mathbf{P} \in \mathbb{R}^{S \times S}, S = |\mathcal{S}| \) </li> 
+          <li> \( \xi^{r} \in \mathbb{R}_{\geq 0} \) is the \( \textit{reference information state} \).
+          <li> \( \mathcal{G}_c[k] = (\mathcal{V}_{c},\mathcal{E}_{c}[k]); \mathcal{V}_{c} = \mathcal{N}, \mathcal{E}_{c}[k]= \{(a,b) \in \mathcal{N} \times \mathcal{N} | a \rightarrow b,k \geq 0 \} \) </li> 
+          <li> \( \mathbf{M}[k] \in \mathbb{R}^{\textit{N} \times \textit{N}} \) is the adjacency matrix </li>
+          <li> \( \mathbf{L}[k] \in \mathbb{R}^{N \times N} \) as the graph Laplacian \( l_{ab}[k] = \sum_{b=1}^{N} m_{ab}[k] = deg(v_a) \) if \( a = b \) and \( l_{ab}[k] = -m_{ab}[k] \) if \( a \neq b \) </li>
+        </ul>  
+      </div>
+    </section>
+
+    <!-- Slide 5 -->
+    <section class="slide">
+    <h2>Main Contributions</h2>
+    <ul style="list-style-type: square;">
+      <li>We show that, under local communication constraints, consensus on the presence of a static feature is almost surely achieved by a group of agents performing random walks on a finite spatial grid.</li>
+      <li> Through Monte Carlo simulations, we empirically characterize the dependence of the expected time until consensus on the number of agents and the grid size, showing that this time generally increases as agent density decreases</li>
+    </ul>
+    </section>
+
+    <!-- Slide 6 -->
+    <section class="slide">
+    <h2>Basics of Markov Chains<h2>  
+    <h3>Definition</h3>
+    <ul style="list-style-type:square;">
+      <li> A Markov chain is collection of random variables \(Z^k_a\) (where the index \(k\) runs through 0, 1, ...) having the property that, given the present, the future is conditionally independent of the past for each agent \(a \).</li>  
+      <li>In other words, 
+      \( Pr(Z_{k+1}^{a} = j ~|~ Z_{k}^{a} = i, Z_{k-1}^{a} = m, \ldots, Z_0^{a} = l )
+      = Pr(Z_{k+1}^{a} = j ~|~ Z_k^{a} = i)\)
+      </li>
+    </ul>
+    <h3> State Transition Matrix </h3>
+    <ul style="list-style-type: square;">
+      <li>Let \(p_{ij}= Pr(Z_{k+1}^{a} = j ~|~ Z_{k}^{a} = i),~ \forall i,j \in \mathcal{S}, ~k \in \mathbb{Z}_+, ~\forall a \in  \mathcal{N} \)</li>          
+      <li>where \( p_{ij} \) is the transition probability of moving from i &rarr; j</li>
+      <li>\( p_{ij} = \begin{cases} 
+         \frac{1}{d_{i}+1}, & (i,j) \in \mathcal{E}_{s} \\
+          0, & otherwise 
+          \end{cases}\)</li>
+      <li>\( d_i\) is the degree of the node</li>
+    </ul> 
+    <h3> Stochastic Matrix</h3>
+    The state transition matrix \( P \) is a stochastic matrix which means that:
+    <ul style="list-style-type: square;">
+      <li> \( \Sigma_{j=1}^{S} p_{ij}= 1, \forall i \in \mathcal{S} \) </li>
+      <li> \( p_{ij} \geq 0, \forall i,j \in \mathcal{S} \) </li>
+    </ul>
+    </section>
+
+    <!-- Slide 7 -->
+    <section class="slide">
+      <h2> Stationary Distribution</h2>
+      <p>A vector \( \pi \in \mathbb{R}^{S} \) is called a stationary distribution of a  Markov chain if \( \pi \) has entries such that:<p>
+      <ul style="list-style-type: square;">
+        <li> \( \pi_{j} \geq 0,\forall j \in \mathcal{S} \)  and \( \sum_{j=1}^{S} \pi_{j} =1 \)</li>
+        <li> \( \pi \mathbf{P} = \pi  \)</li>
+      </ul>  
+      <h2> Irreducible Markov Chain </h2>
+      <ul style="list-style-type: square;">
+        <li> A Markov chain is called irreducible if all the states belong to one closed communication class.</li>
+        <li> Also a MC is called irreducible if a state from any to any other state in finite time.</li>
+      </ul>
+      <li> By construction, the spatial grid forms an \( \textit{irreducible} \) MC. Thus the transition matrix associated with that process is an \( \textit{irreducible} \) matrix.</li>
+      <li> By using \( \textit{Perron Frobenius} \) Lemma, we get that for a stochastic matrix \( \rho(P) =1 \) and it admits a positive left eigen vector of \( P \) which is the stationary distribution of the DTDS MC. </li>
+    </section>
+
+    <!-- Slide 8 -->
+    <section class="slide">
+      <h2> Recurrent Markov Chain</h2>
+      <h3> Theorem 3.3</h3>
+      <ul style="list-style-type: square;">
+        <li> An irreducible Markov chain with transition matrix \( \mathbf{P} \) is positive recurrent if and only if there exists a probability distribution \( \pi \) such that \( \pi \mathbf{P} = \pi \)</li>
+      </ul>
+      <ul style="list-style-type: circle;">
+        <li> We have already shown that MC associated with the spatial grid is \( \textit{irreducible} \) and admits a stationary distribution.</li>
+        <li> Thus using \( \textit{Theorem 3.3} \) we can say that the associated MC is also \( \textit{positive recurrent} \)</li>
+        <li> Due to \( \textit{positive recurrence} \), the agents will keep visiting every node on the spatial grid infinitely often.</li>
+      </ul>
+      <h2> Consensus Strategy </h2>
+      <h3>Definition of Average Consensus</h3>
+      <ul style="list-style-type: square;">
+        <li>We say that the information vectot \( \boldsymbol{\xi}[k] \) reaches average consensus if</li>
+        <li>\( \boldsymbol{\xi}[k]~ \overset{a.s}{\rightarrow} ~  \xi^{r} \mathbf{1} \)  </li>
+      </ul>
+      <p> where \( \mathbf{1} \in \mathbb{R}^{N} \) is a vector of ones</p>
+    </section>
+
+    <!-- Slide 9 -->
+    <section class="slide">
+      <h3> Information Update for Consensus</h3>
+      <ul style="list-style-type: square;">
+        <li> \( \xi_{a} [k+1] = \xi_{a}[k]  - \alpha \sum_{b \in \mathcal{N}^a_k}  l_{ab}[k]*(\xi_{a}[k] - \xi_{b}[k]) \\ 
+      - g_{a} * \gamma (\xi_{a}[k] - \xi^{r}) \)</li>
+      <li> \( a,b \in \mathcal{N}\) represents the agent identity</li>
+      <li>\( \alpha \in (0,1] \) is the interaction weight</li>
+      <li> \( \gamma \in (0,1] \) is a proportional gain.</li>
+      <li>\(  g_{{a}} = \begin{cases}
+    1, &  Z_{k}^{a} \in \mathcal{Z}^{r} \\
+    0, & {\rm otherwise}
+    \end{cases} \)</li>
+      </ul>
+      <h3> Composite Markov Chain</h3>
+      <ul style="list-style-type: square;">
+        <li> The dynamics of all agents' movements on the spatial grid can be modeled by a composite Markov chain with states defined as \( \mathbf{Z}_k = (Z^1_k, Z^2_k, ..., Z^N_k) \in \mathcal{M} \), where \( \mathcal{M} = \mathcal{S}^{\mathcal{N}}\). \( S = |\mathcal{S}| \) and \( |\mathcal{M}| = S^N \).</li>
+        <li> We define an undirected graph \( \hat{\mathcal{G}} = (\hat{\mathcal{V}},\hat{\mathcal{E}}) \) that is associated with the composite Markov chain.</li>
+        <li> The vertex set \( \hat{\mathcal{V}}\) is the set of all possible realizations \( \hat{\imath} \in \mathcal{M} \) of \( \mathbf{Z}_k \).</li>
+        <li>\( \hat{\imath}(a) \) represents the \( a^{th} \) entry of \( \hat{\imath} \), which is the spatial node \( i \in \mathcal{S} \)  occupied by agent \( a \).</li>
+        <li>\( \hat{\mathcal{E}} \) is defined as \( (\hat{\imath},\hat{\jmath}) \in \hat{\mathcal{E}}\) if and only if \( (\hat{\imath}(a),\hat{\jmath}(a)) \in \mathcal{E}_s \) for all agents \( a \in \mathcal{N} \)</li>
+        <li>\( \mathbf{Q} \in \mathbb{R}^{ | \mathcal{M}| \times |\mathcal{M}|} \) be the state transition matrix associated with the composite Markov chain. whose elements are denoted by: \( q_{\hat{\imath} \hat{\jmath}} = \prod_{a=1}^{N} p_{\hat{\imath}(a) \hat{\jmath}(a)}, \forall \hat{\imath}, \hat{\jmath} \in \mathcal{M} \)</li>
+      </ul>
+    </section>
+
+    <!-- Slide 10 -->
+    <section class="slide">
+      <h2> Information Update Dynamics </h2>
+      <ul style="list-style-type: square;">
+        <li> \( \boldsymbol{\hat{\xi}}[k] = [\xi_1[k] \xi_2[k] \ldots \xi_N[k] \xi^r]^T \in \mathbb{R}^{N+1} \) as the augmented state information state vector</li>
+        <li> The information update equation can be represented as in a matrix form is represented as</li>
+        <li> \( \boldsymbol{\hat{\xi}}[k+1] = \mathbf{H}[k] \boldsymbol{\hat{\xi}}[k] \)</li>
+        <li> \( \begin{equation} \mathbf{H}[k] = \begin{bmatrix}
+              ~\mathbf{I} - \alpha \mathbf{L}[k] + \gamma  diag(\mathbf{d}) & ~~ - \gamma \mathbf{d} ~ \\
+              ~\mathbf{0} & 1 
+              \end{bmatrix} \label{eqn:RefUpdateMatrixNotation}
+              \end{equation} \)</li>
+      <li> \( \mathbf{d} = [g_{1} ~ g_{2} ~ \ldots ~ g_{N}]^T \)</li>
+      <li> \( \mathcal{G}_{r}[k] = (\mathcal{V}_{r},\mathcal{E}_{r}[k]) \) be a directed graph in which \( \mathcal{V}_{r} = \mathcal{N} \cup a_f \), the set of agents and the feature, and \( \mathcal{E}_{r}[k] = \mathcal{E}_c[k] \cup \mathcal{E}_f[k] \) where \( \mathcal{E}_f[k] \) is the set of agent-feature pairs \( (a,a_f) \) for which \(Z_{k}^{a} \in \mathcal{Z}^{r} \) at time \( k \)</li>
+      </ul>
+    </section>
+
+    <!-- Slide 11 -->
+    <section class="slide">
+      <h2> Main Result</h2>
+      <h3> Theorem</h3>
+      <ul style="list-style-type: square;">
+        <li> Consider a group of \( N \) agents whose information states evolve according to the previous equation. <!--\eqref{eqn:RefUpdateMatrixNotation}.  -->
+        The information states of all agents will converge to the reference information state \( \xi^r \) almost surely.</li>
+      </ul>
+      <h3>Proof:</h3>
+      <ul style="list-style-type: square;">
+        <li> Suppose that at an initial time \( k_{0} \), the locations of the \( N \) agents on the spatial grid are represented by the node \( \hat{\imath} \in \hat{\mathcal{V}} \). </li>
+        <li> Consider another set of agent locations at a future time \( k_0 + k \), represented by the node \( \hat{\jmath} \in \hat{\mathcal{V}} \).</li>
+        <li> The transition of the agents from configuration \( \hat{\imath} \) to configuration \( \hat{\jmath} \) in \( k \) time steps corresponds to a random walk of length \( k \) on the composite Markov chain \( \mathbf{Z}_k \) from node  \( \hat{\imath} \) to node  \( \hat{\jmath} \).</li>
+        <li> This also corresponds to a random walk by each agent $a$ on the spatial grid from node \( \hat{\imath}(a) \) to node \( \hat{\jmath}(a) \) in \( k \) time steps.</li>
+        <li> By construction, the graph \( \mathcal{G}_s \) is strongly connected and each of its nodes has a self-edge.
+        Thus, there exists a discrete time \( n>0 \) such that, for each agent \( a \), there exists a random walk on the spatial grid from node \( \hat{\imath}(a) \) to node \( \hat{\jmath}(a) \) in \( n \) time steps.  </li>
+        <li> Thus, there always exists a random walk of length \( n \) on the composite Markov chain \( \mathbf{Z}_k \) from node \( \hat{\imath} \) to node \( \hat{\jmath} \) \( \Rightarrow \mathbf{Z}_k \) is an irreducible Markov chain \( \Rightarrow \) all states belong to a single communication class \( \Rightarrow \) all states are \( \textit{recurrent} \Rightarrow \) all states are visited inifinitely often.</li>
+        <li> Since, the composite Markov chain is irreducible, we can conclude that \( \cup_{k \in \mathbb{Z}_+} \mathcal{G}_c[k] = \mathcal{G}_0 \), where \( \mathcal{G}_0 \) is the complete graph on the set of agents \( \mathcal{N} \), and therefore that \( \cup_{k \in \mathbb{Z}_+} \mathcal{G}_r[k] \) contains a directed spanning tree with \( \xi^{r} \) as the fixed root.</li>
+        <li> Since this union of graphs has a spanning tree, we can apply Theorem 3.1 in <a href="#ref1">[1]</a> to conclude that the information state of each agent will converge to \( \xi^{r} \) almost surely</li>
+      </ul>
+      <p id="#ref1">[1] Ion Matei, Nuno C Martins, and John S Baras.  Consensus problemswith directed Markovian communication patterns.  In2009 AmericanControl Conference, pages 1298–1303. IEEE, 2009 </p>
+    </section>
+    
+    <!-- Slide 12 -->
+    <section class="slide">
+      <h2>Monte Carlo Simulations</h2>
+      <div class="column" style="float: left; width: 50%">
+        <div><img src="Images/Presentation1/Expected_Time_for_Consensus.svg">Mean time (s) until consensus is reached, \( \mu \), versus number of agents \( N \) and spatial grid dimension \( c \). Each value of \( \mu \) is averaged over 1000 Monte Carlo simulations of scenarios with the corresponding values of \( N \) and \( c \)</div>
+      </div>
+      <div class="column" style="float: right; width: 50%">
+        <ul style="list-style-type: square;">
+          <li>This demonstrates that a decrease in the agent density \( N/c^2 \) leads to lower agent encounter rates with other agents and with the feature nodes</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Slide 13 -->
+    <section class="slide">
+      <h2>Monte Carlo Simulations</h2>
+      <div class="column" style="float: left; width: 50%">
+        <div><img src="Images/Presentation1/Expected_consensus_time_for_different_team_size.svg"> Time until consensus is reached with varying numbers of agents \( N \) and grid dimension \( c = 5\)</div>
+      </div>
+      <div class="column" style="float: right; width: 50%">
+        <div><img src="Images/Presentation1/Expected_consensus_time_for_different_grid_size.svg"> Time until consensus is reached,with varying \( c\) and \( N = 5 \)</div>
+      </div>
+      <div class="column" style="float: left; width: 100%">
+        <ul style="list-style-type: square;">
+        <li>The left plot shows that for the chosen grid size, \( \sigma \) does not vary substantially with \( N \), whereas the right plot shows that for the chosen number of agents, \( \sigma \) increases significantly with \( c \) (i.e., there is much more variation in the time until consensus over larger domains)</li>
+      </ul>
+      </div>
+    </section>
+
+    <!-- SLide 14  -->
+    <section class="slide">
+      <h2> Matlab Simulations</h2>
+      <div class="column" style="float: left;width: 50%">
+        <img src="Images/Presentation1/Information_Driven_Consensus_2_Agents.svg">Time evolution of the agent information states \( \xi_{a} [k] \)in simulations of N= 2 agents  moving on a 3×3 grid
+      </div>
+      <div class="column" style="float: right;width: 50%">
+        <img src="Images/Presentation1/Information_Driven_Consensus_N_Agents.svg">
+        Time evolution of the agent information states \( \xi_{a} [k] \)in simulations of N= 5 agents moving on a 10×10 grid
+      </div>
+    </section>
+
+    <!-- Slide 15 -->
+    <section class="slide">
+      <style>
+        table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+        }
+
+        td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+        }
+
+        tr:nth-child(even) {
+        background-color: #dddddd;
+        }
+      </style>
+      <h2> Matlab Simulations</h2>
+      <div class="column" style="float: left;width: 50%">
+        <img src="Images/Presentation1/Robustness_to_Information_uncertainty.svg">Time evolution of the agent information states \( \xi_a[k]\) in a simulation of \( N=5 \) agents moving on a \( 10 \times 10 \) grid, with \( \xi^{r} \sim \mathcal{N}(1,0.02) \)
+      </div>
+      <div class="column" style="float: right;width: 50%">
+        <table>
+          <caption>Time until consensus is reached ( \( \mu \pm \sigma \) ), computed from 1000 Monte Carlo simulations of scenarios with different values of \( \xi^r \) and \( \alpha \)</caption>
+          <thead>
+            <tr>
+              <th>Ref. information</th>
+              <th> Interaction weight </th> <th> Time until consensus is reached (s) ( \( \mu \pm \sigma \) )</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>\( \xi^{r} =1 \)</td> 
+              <td> \( \alpha = 0 \)</td>
+              <td>\( 10896 \pm 657 \)</td>
+            </tr>
+            <tr>
+              <td></td> 
+              <td> \( \alpha = 0.5 \)</td>
+              <td>\( 9782 \pm 324 \)</td>
+            </tr>
+            <tr>
+              <td>\( \xi^{r} \sim \mathcal{N}(1,0.02) \) </td>
+              <td>\( \alpha = 0 \)</td>
+              <td>\( 12679 \pm 633 \) </td>
+            </tr>
+            <tr>
+              <td></td> 
+              <td> \( \alpha = 0.5 \)</td>
+              <td>\( 9812 \pm 147 \)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Slide 16 -->
+    <section class="slide">
+      <h2> Gazebo Simulations</h2>
+      <div class="column" style="float: left;width: 50%">
+        <img src="Images/Presentation1/Gazebo_sim_2_AG_3x3.svg">Time evolution of the robot information states \( \xi_a[k] \) in two Gazebo simulations with \( N=2 \) robots moving on a \( 3 \times 3 \) grid
+      </div>
+      <div class="column" style="float: right;width: 50%">
+        <img src="Images/Presentation1/Gazebo_sim_5_AG_10x10.svg">Time evolution of the robot information states \( \xi_a[k] \) in two Gazebo simulations with \( N=5 \) robots moving on a \( 5 \times 5 \) grid.
+      </div>
+    </section>
+    <!-- End slides. -->
+
+    <!-- Begin extension snippets. Add or remove as needed. -->
+
+    <!-- deck.navigation snippet -->
+    <div aria-role="navigation">
+      <a href="#" class="deck-prev-link" title="Previous">&#8592;</a>
+      <a href="#" class="deck-next-link" title="Next">&#8594;</a>
+    </div>
+
+    <!-- deck.status snippet -->
+    <p class="deck-status" aria-role="status">
+      <span class="deck-status-current"></span>
+      /
+      <span class="deck-status-total"></span>
+    </p>
+
+    <!-- deck.goto snippet -->
+    <form action="." method="get" class="goto-form">
+      <label for="goto-slide">Go to slide:</label>
+      <input type="text" name="slidenum" id="goto-slide" list="goto-datalist">
+      <datalist id="goto-datalist"></datalist>
+      <input type="submit" value="Go">
+    </form>
+
+    <!-- End extension snippets. -->
+  </div>
+
+<!-- Required JS files. -->
+<script src="jquery.min.js"></script>
+<script src="core/deck.core.js"></script>
+
+<!-- Extension JS files. Add or remove as needed. -->
+<script src="extensions/menu/deck.menu.js"></script>
+<script src="extensions/goto/deck.goto.js"></script>
+<script src="extensions/status/deck.status.js"></script>
+<script src="extensions/navigation/deck.navigation.js"></script>
+<script src="extensions/scale/deck.scale.js"></script>
+
+<!-- Initialize the deck. You can put this in an external file if desired. -->
+<script>
+  $(function() {
+    $.deck('.slide');
+    $.deck('toggleGoTo')
+    $.deck('toggleMenu');
+  });
+</script>
+</body>
+</html>
